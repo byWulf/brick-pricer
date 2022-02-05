@@ -1,0 +1,23 @@
+{% extends '@!EasyAdmin/layout.html.twig' %}
+
+{% block page_title %}
+    LEGO pricer
+{% endblock %}
+
+{% block content_footer_wrapper %}
+    {% set content_footer = block('content_footer') is defined ? block('content_footer') : '' %}
+    <section class="mt-5 content-footer">
+        {% if content_footer %}
+            <div class="row mb-5">
+                <div class="col">
+                    {{ content_footer }}
+                </div>
+            </div>
+        {% endif %}
+        <div class="row">
+            <div class="col">
+                LEGO® is a trademark of the LEGO Group of companies which does not sponsor, authorize or endorse this site
+            </div>
+        </div>
+    </section>
+{% endblock %}
