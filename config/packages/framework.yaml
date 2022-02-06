@@ -17,6 +17,14 @@ framework:
     php_errors:
         log: true
 
+    http_client:
+        scoped_clients:
+            rebrickable.client:
+                base_uri: 'https://rebrickable.com'
+                headers:
+                    Authorization: 'key %env(REBRICKABLE_API_KEY)%'
+
+
 when@test:
     framework:
         test: true

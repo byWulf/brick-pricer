@@ -41,6 +41,9 @@
     "daverandom/libdns": {
         "version": "v2.0.2"
     },
+    "davidgorges/color-contrast": {
+        "version": "v1.0.0"
+    },
     "doctrine/annotations": {
         "version": "1.13",
         "recipe": {
@@ -150,6 +153,9 @@
     },
     "league/uri-parser": {
         "version": "1.4.1"
+    },
+    "mischiefcollective/colorjizz": {
+        "version": "1.0.0"
     },
     "monolog/monolog": {
         "version": "2.3.5"

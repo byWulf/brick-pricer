@@ -1,0 +1,3 @@
+<span class="{{ entity.instance.countNeeded == 0 ? 'text-muted' : entity.instance.countHaving >= entity.instance.countNeeded ? 'text-success' : 'text-warning' }}">
+    {{ entity.instance.countHaving }} / {{ entity.instance.countNeeded }}
+</span>
