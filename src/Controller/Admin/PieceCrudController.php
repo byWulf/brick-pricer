@@ -14,6 +14,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
@@ -49,8 +51,14 @@ class PieceCrudController extends AbstractCrudController
                 ->setFormTypeOption('prototype_data', new PieceCount())
                 ->setFormTypeOption('by_reference', false)
                 ->hideOnIndex(),
-            NumberField::new('cachedPartsNeeded')
+            IntegerField::new('cachedPartsNeeded')
                 ->setTemplatePath('easy_admin/piece/count.html.twig')
+                ->hideOnForm(),
+            MoneyField::new('cachedBestSinglePrice')
+                ->setCurrency('EUR')
+                ->hideOnForm(),
+            MoneyField::new('cachedBestPriceSumNeeded')
+                ->setCurrency('EUR')
                 ->hideOnForm(),
         ];
     }

@@ -25,6 +25,10 @@ framework:
                     Authorization: 'key %env(REBRICKABLE_API_KEY)%'
                 retry_failed:
                     enabled: true
+            lego.client:
+                base_uri: 'https://www.lego.com'
+                retry_failed:
+                    enabled: true
 
 
 when@test:

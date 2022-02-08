@@ -88,6 +88,17 @@ class Color implements Stringable
         return $this->externalColors;
     }
 
+    public function getExternalColorBySystem(string $system): ?ExternalColor
+    {
+        foreach ($this->externalColors as $externalColor) {
+            if ($externalColor->getSystem() === $system) {
+                return $externalColor;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @param Collection<ExternalColor> $externalColors
      */

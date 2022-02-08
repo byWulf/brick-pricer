@@ -12,6 +12,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 
@@ -36,7 +38,14 @@ class PieceListCrudController extends AbstractCrudController
             TextField::new('name'),
             Field::new('rebrickableListId')
                 ->setFormType(PartListType::class)
-                ->hideOnIndex()
+                ->hideOnIndex(),
+            IntegerField::new('partsNeeded')
+                ->setVirtual(true)
+                ->hideOnForm(),
+            MoneyField::new('priceSumNeeded')
+                ->setCurrency('EUR')
+                ->setVirtual(true)
+                ->hideOnForm(),
         ];
     }
 }

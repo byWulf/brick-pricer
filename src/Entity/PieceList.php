@@ -23,7 +23,7 @@ class PieceList implements Stringable
     private string $name;
 
     /** @var Collection<PieceCount> */
-    #[ORM\OneToMany(mappedBy: 'lists', targetEntity: Piece::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'list', targetEntity: PieceCount::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $pieces;
 
     #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true])]
@@ -103,6 +103,16 @@ class PieceList implements Stringable
     {
         $this->needImport = $needImport;
         return $this;
+    }
+
+    public function getPartsNeeded(): int
+    {
+        return array_sum(array_map(fn (PieceCount $pieceCount): int => $pieceCount->getCountNeeded() - $pieceCount->getCountHaving(), $this->getPieces()->toArray()));
+    }
+
+    public function getPriceSumNeeded(): int
+    {
+        return array_sum(array_map(fn (PieceCount $pieceCount): int => $pieceCount->getPiece()->getCachedBestPriceSumNeeded() ?? 0, $this->getPieces()->toArray()));
     }
 
     public function __toString(): string
