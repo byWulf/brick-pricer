@@ -23,6 +23,8 @@ framework:
                 base_uri: 'https://rebrickable.com'
                 headers:
                     Authorization: 'key %env(REBRICKABLE_API_KEY)%'
+                retry_failed:
+                    enabled: true
 
 
 when@test:

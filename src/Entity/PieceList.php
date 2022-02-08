@@ -26,6 +26,12 @@ class PieceList implements Stringable
     #[ORM\OneToMany(mappedBy: 'lists', targetEntity: Piece::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $pieces;
 
+    #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true])]
+    private int $rebrickableListId;
+
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private bool $needImport = true;
+
     public function __construct()
     {
         $this->pieces = new ArrayCollection();
@@ -74,6 +80,28 @@ class PieceList implements Stringable
     public function removePiece(PieceCount $piece): PieceList
     {
         $this->pieces->removeElement($piece);
+        return $this;
+    }
+
+    public function getRebrickableListId(): int
+    {
+        return $this->rebrickableListId;
+    }
+
+    public function setRebrickableListId(int $rebrickableListId): PieceList
+    {
+        $this->rebrickableListId = $rebrickableListId;
+        return $this;
+    }
+
+    public function isNeedImport(): bool
+    {
+        return $this->needImport;
+    }
+
+    public function setNeedImport(bool $needImport): PieceList
+    {
+        $this->needImport = $needImport;
         return $this;
     }
 

@@ -42,6 +42,9 @@ class Piece
     #[ORM\OneToMany(mappedBy: 'piece', targetEntity: PieceNumber::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $externalIds;
 
+    #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true])]
+    private int $cachedPartsNeeded;
+
     public function __construct()
     {
         $this->lists = new ArrayCollection();
@@ -130,6 +133,17 @@ class Piece
         return $this->lists;
     }
 
+    public function getCountByPieceList(PieceList $list): ?PieceCount
+    {
+        foreach ($this->lists as $count) {
+            if ($count->getList()->getId() === $list->getId()) {
+                return $count;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @param Collection<PieceCount> $lists
      */
@@ -200,5 +214,23 @@ class Piece
     public function getCountHaving(): int
     {
         return array_sum(array_map(fn (PieceCount $count): int => $count->getCountHaving(), $this->getLists()->toArray()));
+    }
+
+    public function getCachedPartsNeeded(): int
+    {
+        return $this->cachedPartsNeeded;
+    }
+
+    public function setCachedPartsNeeded(int $cachedPartsNeeded): Piece
+    {
+        $this->cachedPartsNeeded = $cachedPartsNeeded;
+        return $this;
+    }
+
+    public function updateCache(): Piece
+    {
+        $this->cachedPartsNeeded = array_sum(array_map(fn (PieceCount $pieceCount): int => $pieceCount->getCountNeeded(), $this->lists->toArray())) - array_sum(array_map(fn (PieceCount $pieceCount): int => $pieceCount->getCountHaving(), $this->lists->toArray()));
+
+        return $this;
     }
 }

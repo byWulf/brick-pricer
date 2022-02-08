@@ -49,7 +49,7 @@ class PieceCrudController extends AbstractCrudController
                 ->setFormTypeOption('prototype_data', new PieceCount())
                 ->setFormTypeOption('by_reference', false)
                 ->hideOnIndex(),
-            NumberField::new('countNeeded')
+            NumberField::new('cachedPartsNeeded')
                 ->setTemplatePath('easy_admin/piece/count.html.twig')
                 ->hideOnForm(),
         ];
@@ -77,6 +77,18 @@ class PieceCrudController extends AbstractCrudController
             $entityInstance->addExternalId($pieceNumber);
         }
 
+        $entityInstance->updateCache();
+
         parent::persistEntity($entityManager, $entityInstance);
+    }
+
+    /**
+     * @param Piece $entityInstance
+     */
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        $entityInstance->updateCache();
+
+        parent::updateEntity($entityManager, $entityInstance);
     }
 }
