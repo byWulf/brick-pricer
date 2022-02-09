@@ -6,13 +6,14 @@ namespace App\PriceFetcher;
 
 use App\Client\PickABrickClient;
 use App\Entity\Piece;
+use App\Entity\PiecePrice;
 use Symfony\Contracts\Cache\CacheInterface;
 
 class PickABrickPriceFetcher implements PriceFetcherInterface
 {
     public function __construct(
         private PickABrickClient $pickABrickClient,
-        private CacheInterface $pickABrickCache
+        private CacheInterface   $filesystemCache
     ) {
     }
 
@@ -21,19 +22,19 @@ class PickABrickPriceFetcher implements PriceFetcherInterface
         return 'Pick a Brick';
     }
 
-    public function fetchPrice(Piece $piece): ?int
+    public function fetchPrice(Piece $piece, PiecePrice $price): void
     {
         $externalIds = $piece->getExternalIdsBySystem('LEGO');
         if ($externalIds === null) {
-            return null;
+            return;
         }
 
         $externalColor = $piece->getColor()->getExternalColorBySystem('LEGO');
         if ($externalColor === null) {
-            return null;
+            return;
         }
 
-        $parts = $this->pickABrickCache->get('pickABrickParts', fn() => $this->pickABrickClient->getPickABrickParts());
+        $parts = $this->filesystemCache->get('pickABrickParts', fn() => $this->pickABrickClient->getPickABrickParts());
 
         foreach ($parts as $part) {
             if (!isset($part['variant'])) {
@@ -44,10 +45,9 @@ class PickABrickPriceFetcher implements PriceFetcherInterface
                 in_array($part['variant']['attributes']['designNumber'], $externalIds->getIds()) &&
                 in_array($part['variant']['attributes']['colourId'], $externalColor->getIds())
             ) {
-                return $part['variant']['price']['centAmount'];
+                $price->setPrice($part['variant']['price']['centAmount']);
+                return;
             }
         }
-
-        return null;
     }
 }

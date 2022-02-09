@@ -7,10 +7,11 @@ namespace App\Command;
 use App\Client\RebrickableClient;
 use App\Entity\Piece;
 use App\Entity\PieceCount;
-use App\Entity\PieceNumber;
 use App\Repository\ColorRepository;
 use App\Repository\PieceListRepository;
 use App\Repository\PieceRepository;
+use App\Service\PieceService;
+use App\Service\PriceService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -25,7 +26,9 @@ class ImportPartListsCommand extends Command
         private EntityManagerInterface $entityManager,
         private PieceListRepository $pieceListRepository,
         private PieceRepository $pieceRepository,
-        private ColorRepository $colorRepository
+        private PieceService $pieceService,
+        private ColorRepository $colorRepository,
+        private PriceService $priceService
     ) {
         parent::__construct();
     }
@@ -39,23 +42,10 @@ class ImportPartListsCommand extends Command
                 $piece = $this->pieceRepository->findPart($partListEntry['part']['part_num'], $partListEntry['color']['id']);
                 if ($piece === null) {
                     $piece = new Piece();
-                    $piece
-                        ->setPartNumber($partListEntry['part']['part_num'])
-                        ->setColor($this->colorRepository->find($partListEntry['color']['id']))
-                        ->setName($partListEntry['part']['name'])
-                    ;
+                    $piece->setPartNumber($partListEntry['part']['part_num']);
+                    $piece->setColor($this->colorRepository->find($partListEntry['color']['id']));
 
-                    $colorResponse = $this->rebrickableClient->getPartColor($piece->getPartNumber(), $piece->getColor()->getId());
-                    $piece->setImageUrl($colorResponse['part_img_url']);
-
-                    foreach ($partListEntry['part']['external_ids'] as $system => $externalIdResponse) {
-                        $pieceNumber = new PieceNumber();
-                        $pieceNumber
-                            ->setSystem($system)
-                            ->setIds($externalIdResponse)
-                        ;
-                        $piece->addExternalId($pieceNumber);
-                    }
+                    $this->pieceService->enrichPieceInformation($piece, $partListEntry['part']);
 
                     $this->entityManager->persist($piece);
                 }
@@ -69,8 +59,9 @@ class ImportPartListsCommand extends Command
                 }
 
                 $count->setCountNeeded($partListEntry['quantity']);
-
                 $piece->updateCache();
+
+                $this->priceService->updatePrices($piece);
             }
 
             $this->entityManager->flush();

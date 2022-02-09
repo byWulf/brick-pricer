@@ -2,27 +2,25 @@
 
 namespace App\Controller\Admin;
 
-use App\Client\RebrickableClient;
 use App\Entity\Piece;
 use App\Entity\PieceCount;
-use App\Entity\PieceNumber;
 use App\Form\Type\PieceCountType;
+use App\Service\PieceService;
+use App\Service\PriceService;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class PieceCrudController extends AbstractCrudController
 {
     public function __construct(
-        private RebrickableClient $rebrickableClient
+        private PieceService $pieceService,
+        private PriceService $priceService
     ) {
     }
 
@@ -68,24 +66,8 @@ class PieceCrudController extends AbstractCrudController
      */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        $partResponse = $this->rebrickableClient->getPart($entityInstance->getPartNumber());
-        $colorResponse = $this->rebrickableClient->getPartColor($entityInstance->getPartNumber(), $entityInstance->getColor()->getId());
-
-        $entityInstance
-            ->setName($partResponse['name'])
-            ->setImageUrl($colorResponse['part_img_url'])
-        ;
-
-        foreach ($partResponse['external_ids'] as $system => $externalIdResponse) {
-            $pieceNumber = new PieceNumber();
-            $pieceNumber
-                ->setSystem($system)
-                ->setIds($externalIdResponse)
-            ;
-            $entityInstance->addExternalId($pieceNumber);
-        }
-
-        $entityInstance->updateCache();
+        $this->pieceService->enrichPieceInformation($entityInstance);
+        $this->priceService->updatePrices($entityInstance);
 
         parent::persistEntity($entityManager, $entityInstance);
     }
@@ -95,7 +77,8 @@ class PieceCrudController extends AbstractCrudController
      */
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        $entityInstance->updateCache();
+        $this->pieceService->enrichPieceInformation($entityInstance);
+        $this->priceService->updatePrices($entityInstance);
 
         parent::updateEntity($entityManager, $entityInstance);
     }

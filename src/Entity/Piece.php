@@ -60,6 +60,7 @@ class Piece implements Stringable
     {
         $this->lists = new ArrayCollection();
         $this->externalIds = new ArrayCollection();
+        $this->prices = new ArrayCollection();
     }
 
     public function getId(): int

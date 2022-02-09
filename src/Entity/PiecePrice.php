@@ -27,6 +27,9 @@ class PiecePrice
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private DateTimeImmutable $updated;
+    
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $context;
 
     /**
      * @return int
@@ -83,6 +86,17 @@ class PiecePrice
     public function setUpdated(DateTimeImmutable $updated): PiecePrice
     {
         $this->updated = $updated;
+        return $this;
+    }
+
+    public function getContext(): ?array
+    {
+        return $this->context;
+    }
+
+    public function setContext(?array $context): PiecePrice
+    {
+        $this->context = $context;
         return $this;
     }
 }

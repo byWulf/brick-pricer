@@ -19,6 +19,6 @@ framework:
             #my.dedicated.cache: null
 
         pools:
-            pick_a_brick_cache:
+            filesystem_cache:
                 adapter: cache.adapter.filesystem
                 default_lifetime: 86400

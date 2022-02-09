@@ -27,46 +27,52 @@ class PickABrickClient
                         'x-locale' => 'de-DE',
                         'Content-Type' => 'application/json',
                         'Accept' => 'application/json',
+                        'session-cookie-id' => 'lego',
                     ],
                     'json' => [
                         'operationName' => 'PickABrickQuery',
-                        'query' => 'query PickABrickQuery($page: Int, $perPage: Int) { 
-                        __typename  elements(    page: $page    perPage: $perPage  ) {    
-                            results 
-                            {      
-                            ...ElementLeafData      __typename    
-                            }    
-                            total    __typename  
+                        'query' => 'query PickABrickQuery($query: String, $page: Int, $perPage: Int, $sort: SortInput, $filters: [Filter!]) {
+                            elements(
+                                query: $query
+                                page: $page
+                                perPage: $perPage
+                                filters: $filters
+                                sort: $sort
+                            ) {
+                                count
+                                results {
+                                    ...ElementLeafData
+                                }
+                                total
+                            }
                         }
-                    }
-                    fragment ElementLeafData on Element {  
-                        ... on SingleVariantElement {    
-                            variant {      
-                                ...ElementLeafVariant      __typename    
-                            }    
-                            __typename  
-                        }  
-                        ... on MultiVariantElement 
-                        {    
-                            variants {      
-                                ...ElementLeafVariant      __typename    
-                            }    
-                            __typename  
-                        }  
-                        __typename
-                    }
-                    fragment ElementLeafVariant on ElementVariant {  
-                        id  price {    
-                            centAmount    formattedAmount    __typename  
-                        }  
-                        attributes {    
-                            designNumber    colourId    deliveryChannel    __typename  
-                        }  
-                        __typename
-                    }',
+                        
+                        fragment ElementLeafData on Element {
+                            ... on SingleVariantElement {
+                                variant {
+                                    ...ElementLeafVariant
+                                }
+                            }
+                        }
+                        
+                        fragment ElementLeafVariant on ElementVariant {
+                            id
+                            price {
+                                centAmount
+                                formattedAmount
+                            }
+                            attributes {
+                                designNumber
+                                colourId
+                                deliveryChannel
+                            }
+                        }',
                         'variables' => [
                             'page' => $page,
-                            'perPage' => 500
+                            'perPage' => 500,
+                            'query' => '',
+                            'filters' => [],
+                            'sort' => ['key' => 'RELEVANCE', 'direction' => 'ASC'],
                         ]
                     ]
                 ]
